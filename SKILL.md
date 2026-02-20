@@ -1,54 +1,57 @@
----
-name: "Auto Cut + Telop Burn"
-description: "MP4(ローカル/直mp4 URL) → 文字起こし → 無音カット → SRT生成 → 字幕焼き付け → mp4出力"
-version: "0.1.0"
-author: "Hatake"
-license: "MIT"
----
+name: auto-cut-telop-burn
+description: auto cut silences and burn subtitles into mp4
+version: 0.1.0
+Auto Cut + Telop Burn (MP4)
+What it does
 
-# Auto Cut + Telop Burn (MP4)
+Input: local MP4 file path OR direct MP4 URL
 
-## 概要
-このSkillは、MP4動画（ローカルファイル or 直mp4 URL）を入力として受け取り、以下を自動で行います。
+Transcribe with timestamps
 
-- 動画から音声を抽出
-- 文字起こし（タイムコード付き）
-- 無音区間の検出 → テンポよくカット
-- カット後のタイムラインに合わせて字幕（SRT）を再マッピング
-- 字幕を動画へ焼き付けて書き出し
+Detect silences and cut them (tempo-up)
 
-> ⚠️ 注意：このSkillが自動でダウンロードできるのは **直mp4 URL（URL内に .mp4 を含む）** のみです。  
-> Instagram/YouTubeなどの「ページURL」から動画を取得する処理は、権限・仕様・規約・著作権の問題で不安定/非推奨のため、**動画ファイル（mp4）をアップロードして入力**してください。
+Remap subtitles to the cut timeline (SRT)
 
----
+Burn subtitles into the final MP4
 
-## 入力（Inputs）
-- `--input` : ローカルのMP4ファイルパス、または **直mp4 URL**
-- `--lang` : 文字起こし言語（デフォルト：`ja`）
-- `--silence` : 「無音」とみなして削除対象にする秒数（デフォルト：`0.6`）
-- `--keep-pad` : 無音区間の前後に残す余韻秒数（デフォルト：`0.15`）
-- `--max-line` : テロップ1行あたり最大文字数（デフォルト：`18`）
+Note: This skill auto-downloads only when the URL is a direct MP4 link (e.g. ends with .mp4).
+For Instagram/YouTube page URLs, please download/export the MP4 yourself and pass the local file path.
 
----
+Inputs
 
-## 出力（Outputs）
-出力は `output/` に生成されます。
+--input : local mp4 path OR direct mp4 url
 
-- `final_burned.mp4`  
-  カット済み + 字幕焼き付け済みの最終動画
-- `subtitles.srt`  
-  カット後タイムラインに合わせた字幕ファイル
-- `cut_list.csv`  
-  どの区間を削除したかのログ（開始/終了/長さ）
-- `transcript.txt`  
-  全文文字起こし
-- `original.mp4`  
-  入力がURLだった場合にダウンロードした原本（任意）
+--lang : transcription language (default: ja)
 
----
+--silence : silence duration threshold to remove seconds (default: 0.6)
 
-## 使い方（Usage）
+--keep-pad : keep seconds before/after each cut (default: 0.15)
 
-### 1) ローカルMP4を入力する（推奨）
-```bash
+--max-line : max characters per subtitle line (default: 18)
+
+Outputs (output/)
+
+final_burned.mp4
+
+subtitles.srt
+
+cut_list.csv
+
+transcript.txt
+
+original.mp4 (if downloaded)
+
+Usage
+
 bash run.sh --input "/path/to/video.mp4"
+bash run.sh --input "https://example.com/video.mp4
+"
+bash run.sh --input "/path/to/video.mp4" --lang ja --silence 0.6 --keep-pad 0.15 --max-line 18
+
+Requirements
+
+ffmpeg / ffprobe
+
+Python 3
+
+requirements.txt packages
